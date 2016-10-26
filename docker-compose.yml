@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+
+  gitlab:
+    build:
+      context: .
+    restart: always
+    hostname: 'localhost'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://localhost'
+        nginx['listen_port'] = 443
+        nginx['listen_https'] = true
+      GITLAB_POST_RECONFIGURE_SCRIPT: mkdir /etc/gitlab/ssl && cd /etc/gitlab/ssl && openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=localhost" -keyout localhost.key -out localhost.crt
+    ports:
+      - '22:22'
+      - '443:443'
+    volumes:
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+
+volumes:
+  gitlab_config:
+  gitlab_logs:
+  gitlab_data:  
